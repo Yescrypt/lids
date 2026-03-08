@@ -2,26 +2,33 @@
 
 # 🛡️ LIDS
 
-# Linux Intrusion Detection System
+## Linux Intrusion Detection System
 
 **Real-time attack detection · Telegram alerts**
 
-Lightweight host-based security agent for Kali Linux, Parrot OS, and Arch Linux.
-Real-time alerts via Telegram. One-line install.
+Lightweight host-based security agent for **Kali Linux, Parrot OS, and Arch Linux**.  
+Real-time alerts via Telegram · One-line install.
 
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=python" height="48">
-  &nbsp;&nbsp;&nbsp;
-  <img src="https://skillicons.dev/icons?i=linux" height="48">
-  &nbsp;&nbsp;&nbsp;
-  <img src="https://cdn.simpleicons.org/opensourceinitiative/3DA639" height="48">
-</p>
+<br>
 
-<p align="center">
-  <b>Python</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <b>Linux</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <b>MIT</b>
-</p>
+<table>
+<tr>
+<td align="center" width="120">
+<img src="https://skillicons.dev/icons?i=python" width="48"><br>
+<b>Python</b>
+</td>
+
+<td align="center" width="120">
+<img src="https://skillicons.dev/icons?i=linux" width="48"><br>
+<b>Linux</b>
+</td>
+
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/opensourceinitiative/3DA639" width="48"><br>
+<b>MIT</b>
+</td>
+</tr>
+</table>
 
 </div>
 
