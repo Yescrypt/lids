@@ -107,4 +107,4 @@ tail -f /var/log/lids/lids.log  # Logs
 MIT License © 2026 LIDS Contributors
 
 This project is licensed under the MIT License.  
-See the <img src="https://cdn-icons-png.flaticon.com/256/1/1430.png" width="20"> [MIT](LICENSE) file for details.
+See the <img src="https://cdn-icons-png.flaticon.com/512/1208/1208147.png" width="20"> [MIT](LICENSE) file for details.
