@@ -61,7 +61,14 @@ Lightweight host-based security monitoring agent for
 git clone https://github.com/Yescrypt/lids
 cd lids
 sudo bash install.sh
+
 ```
+## Quick Install
+# curl | bash
+```bash
+curl -s https://raw.githubusercontent.com/Yescrypt/lids/main/install.sh | sudo bash
+```
+
 
 Installer asks:
 
