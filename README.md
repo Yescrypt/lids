@@ -10,13 +10,16 @@ Lightweight host-based security agent for Kali Linux, Parrot OS, and Arch Linux.
 Real-time alerts via Telegram. One-line install.
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=python,linux" />
-  <img src="https://img.shields.io/badge/MIT-License-green?style=flat-square" />
+  <img src="https://skillicons.dev/icons?i=python" height="48">
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://skillicons.dev/icons?i=linux" height="48">
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://cdn.simpleicons.org/opensourceinitiative/3DA639" height="48">
 </p>
 
 <p align="center">
-  <b>Python</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <b>Linux</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Python</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Linux</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <b>MIT</b>
 </p>
 
