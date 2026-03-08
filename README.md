@@ -64,7 +64,7 @@ sudo bash install.sh
 
 ```
 ## Quick Install
-# curl | bash
+### curl | bash
 ```bash
 curl -s https://raw.githubusercontent.com/Yescrypt/lids/main/install.sh | sudo bash
 ```
