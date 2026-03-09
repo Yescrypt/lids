@@ -19,6 +19,7 @@ LIDS_LOG="/var/log/lids"
 API_URL="https://lids.yescrypt.uz"
 SERVICE_FILE="/etc/systemd/system/lids.service"
 
+
 echo ""
 echo -e "${CYAN}${BOLD}"
 echo "                             ██╗     ██╗██████╗ ███████╗"
@@ -73,7 +74,7 @@ get_input() {
     echo ""
     echo -e "${BOLD}Setup${NC}"
     echo "────────────────────────────"
-    
+
     read -p "  Hostname label [$(hostname)]: " HOST_LABEL
     HOST_LABEL=${HOST_LABEL:-$(hostname)}
 
@@ -94,6 +95,7 @@ get_input() {
 register_agent() {
     RESPONSE=$(curl -s -X POST "$API_URL/api/register" \
         -H "Content-Type: application/json" \
+        -H "X-Lids-Agent: yes" \
         -d "{
             \"hostname\": \"$HOST_LABEL\",
             \"os\": \"$OS_NAME\",
@@ -106,8 +108,9 @@ register_agent() {
     AUTH_KEY=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('auth_key',''))" 2>/dev/null)
 
     if [[ -z "$AGENT_ID" ]]; then
-        echo -e "${RED}[!] Registration failed. Check API URL or try again.${NC}"
-        echo "    Response: $RESPONSE"
+        echo -e "${RED}[!] Royxatdan otish xato.${NC}"
+        echo -e "${RED}    Server javobi: $RESPONSE${NC}"
+        echo -e "${YELLOW}    Tekshiring: API URL togri? Internet bor?${NC}"
         exit 1
     fi
     echo -e "${GREEN}[✓] Registered. Agent ID: $AGENT_ID${NC}"
@@ -116,11 +119,10 @@ register_agent() {
 # Install files
 install_files() {
     echo -e "${YELLOW}[*] Installing LIDS...${NC}"
-    
+
     mkdir -p "$LIDS_DIR" "$LIDS_CONF" "$LIDS_LOG"
     cp -r ./agent/* "$LIDS_DIR/"
-    
-    # Write config
+
     cat > "$LIDS_CONF/lids.conf" <<EOF
 {
     "api_url": "$API_URL",
@@ -134,7 +136,7 @@ install_files() {
     "log_level": "INFO"
 }
 EOF
-    
+
     chmod 600 "$LIDS_CONF/lids.conf"
     echo -e "${GREEN}[✓] Files installed${NC}"
 }
@@ -163,7 +165,7 @@ EOF
     echo -e "${GREEN}[✓] LIDS service started${NC}"
 }
 
-# Main
+# ── Main ──────────────────────────────────────
 detect_os
 install_deps
 get_input
@@ -172,17 +174,31 @@ install_files
 install_service
 
 echo ""
-echo -e "${GREEN}${BOLD}  ✅ LIDS installed successfully!${NC}"
+echo -e "  ${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "  ${GREEN}${BOLD}✅  LIDS muvaffaqiyatli o'rnatildi!${NC}"
 echo ""
-echo -e "  Status:  ${CYAN}systemctl status lids${NC}"
-echo -e "  Logs:    ${CYAN}tail -f /var/log/lids/lids.log${NC}"
-echo -e "  Config:  ${CYAN}$LIDS_CONF/lids.conf${NC}"
+echo -e "  ${BOLD}Nazorat qilinadi:${NC}"
+echo -e "  ${GREEN}✓${NC}  Portlar        — yangi ochilgan portlar"
+echo -e "  ${GREEN}✓${NC}  SSH            — zaif konfiguratsiya, brute force"
+echo -e "  ${GREEN}✓${NC}  Backdoor       — reverse shell, cron, SUID, webshell"
+echo -e "  ${GREEN}✓${NC}  Jarayonlar     — miner, C2, /tmp executable"
+echo -e "  ${GREEN}✓${NC}  Loglar         — brute force, root login, sudo abuse"
+echo -e "  ${GREEN}✓${NC}  Malware        — rkhunter, chkrootkit"
+echo ""
+echo -e "  ${BOLD}Buyruqlar:${NC}"
+echo -e "  Status   : ${CYAN}systemctl status lids${NC}"
+echo -e "  Loglar   : ${CYAN}tail -f /var/log/lids/lids.log${NC}"
+echo -e "  Config   : ${CYAN}$LIDS_CONF/lids.conf${NC}"
+echo -e "  Restart  : ${CYAN}systemctl restart lids${NC}"
+echo -e "  O'chirish: ${CYAN}sudo bash uninstall.sh${NC}"
 echo ""
 echo -e "  ${BOLD}Telegram:${NC}"
 echo -e "  Alertlar ${BOLD}${TG_USER_ID}${NC} ga yuboriladi"
 echo -e "  Bot: ${CYAN}@lids_osf_bot${NC}"
 echo ""
 echo -e "  ${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "  ${YELLOW}Telegram da tasdiqlov xabarini tekshiring!${NC}"
+echo -e "  ${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-echo -e "  ${YELLOW}Check your Telegram for confirmation message!${NC}"
-echo ""
+
+systemctl restart lids 2>/dev/null || true
