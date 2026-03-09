@@ -66,20 +66,43 @@ PERSISTENCE_PATHS = [
 
 # Legitimate SUID binaries (whitelist)
 LEGIT_SUID = {
+    # Core system
     '/usr/bin/sudo', '/usr/bin/su', '/usr/bin/passwd', '/usr/bin/newgrp',
     '/usr/bin/gpasswd', '/usr/bin/chfn', '/usr/bin/chsh', '/usr/bin/mount',
     '/usr/bin/umount', '/usr/bin/pkexec', '/usr/bin/ping', '/usr/bin/crontab',
     '/usr/bin/ssh-agent', '/usr/bin/chage', '/usr/bin/expiry',
     '/usr/bin/fusermount3', '/usr/bin/dotlockfile', '/usr/bin/ntfs-3g',
-    '/usr/sbin/mount.nfs', '/usr/sbin/unix_chkpwd', '/usr/sbin/exim4',
-    '/usr/sbin/pppd',
+    '/bin/mount', '/bin/umount', '/bin/su', '/bin/ping',
+    # System libs
     '/usr/lib/dbus-1.0/dbus-daemon-launch-helper',
     '/usr/lib/openssh/ssh-keysign',
+    '/usr/lib/polkit-1/polkit-agent-helper-1',
+    '/usr/lib/x86_64-linux-gnu/utempter/utempter',
     '/usr/libexec/camel-lock-helper-1.2',
-    '/usr/share/code/chrome-sandbox',
+    # System daemons
+    '/usr/sbin/pppd', '/usr/sbin/mount.nfs', '/usr/sbin/unix_chkpwd',
+    '/usr/sbin/exim4',
+    # Sandboxes (browsers, electron apps)
     '/usr/lib/chromium/chrome-sandbox',
+    '/usr/share/code/chrome-sandbox',
     '/opt/google/chrome/chrome-sandbox',
-    '/bin/mount', '/bin/umount', '/bin/su', '/bin/ping',
+    '/usr/lib/obsidian/chrome-sandbox',
+    # VirtualBox
+    '/usr/lib/virtualbox/VBoxNetAdpCtl',
+    '/usr/lib/virtualbox/VBoxNetNAT',
+    '/usr/lib/virtualbox/VBoxNetDHCP',
+    '/usr/lib/virtualbox/VBoxSDL',
+    '/usr/lib/virtualbox/VBoxHeadless',
+    '/usr/lib/virtualbox/VirtualBoxVM',
+    # nvidia
+    '/usr/bin/nvidia-modprobe',
+    # Xorg
+    '/usr/lib/xorg/Xorg.wrap',
+}
+
+# Directories that look like SUID but are not binaries
+LEGIT_SUID_DIRS = {
+    '/var/mail', '/var/log', '/run/log',
 }
 
 # Webshell signatures
@@ -299,7 +322,15 @@ class BackdoorScanner:
             )
             for path in result.stdout.splitlines():
                 path = path.strip()
-                if path and path not in LEGIT_SUID:
+                if not path:
+                    continue
+                # Skip directories
+                if os.path.isdir(path):
+                    continue
+                # Skip whitelisted dirs
+                if any(path.startswith(d) for d in LEGIT_SUID_DIRS):
+                    continue
+                if path not in LEGIT_SUID:
                     alert_id = f"suid_{path}"
                     if alert_id not in self.seen_alerts:
                         self.seen_alerts.add(alert_id)
@@ -475,14 +506,6 @@ class BackdoorScanner:
                         st = os.stat(fpath)
                         # Executable bit set
                         if st.st_mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH):
-                            # Skip known false positives
-                            skip_patterns = [
-                                'chrome', 'Chrome', 'google', 'telegram', 'TD-webview',
-                                '.X11-unix', 'SingletonSocket', '.dbus', 'snap-',
-                                'systemd', 'runtime-'
-                            ]
-                            if any(p in fpath for p in skip_patterns):
-                                continue
                             alert_id = f"tmpexec_{fpath}"
                             if alert_id not in self.seen_alerts:
                                 self.seen_alerts.add(alert_id)
