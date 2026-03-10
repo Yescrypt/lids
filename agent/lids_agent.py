@@ -20,7 +20,7 @@ from modules.log_monitor import LogMonitor
 from modules.process_monitor import ProcessMonitor
 from modules.backdoor_scanner import BackdoorScanner
 from modules.malware_scan import MalwareScan
-from modules.firewall import Firewall
+from modules.command_executor import CommandExecutor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,7 +38,6 @@ class LIDSAgent:
     def __init__(self):
         self.config = Config()
         self.api = APIClient(self.config)
-        self.firewall = Firewall()
 
         self.modules = [
             PortMonitor(self.config, self.api),
@@ -47,12 +46,11 @@ class LIDSAgent:
             ProcessMonitor(self.config, self.api),
             BackdoorScanner(self.config, self.api),
             MalwareScan(self.config, self.api),
+            CommandExecutor(self.config, self.api),   # ← polls & executes commands
         ]
 
     def run(self):
         logger.info("🛡 LIDS Agent starting...")
-        
-        # Send heartbeat to server
         self.api.send_heartbeat()
 
         threads = []
@@ -62,7 +60,6 @@ class LIDSAgent:
             threads.append(t)
             logger.info(f"✅ Module started: {module.__class__.__name__}")
 
-        # Keep alive
         while True:
             try:
                 self.api.send_heartbeat()
