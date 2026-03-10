@@ -21,6 +21,44 @@ SUSPICIOUS_NAMES = [
 
 SUSPICIOUS_PATHS = ['/tmp/', '/dev/shm/', '/var/tmp/']
 
+# /tmp da ishlashi NORMAL bo'lgan jarayonlar — false positive oldini olish
+TMP_WHITELIST_PATTERNS = [
+    r'\.X\d+-lock',           # X11 lock files
+    r'snap-',                 # Snap packages
+    r'systemd-',              # systemd temp files
+    r'runtime-',              # User runtime dirs
+    r'\.mount_',              # Mount points
+    r'chrome',                # Google Chrome
+    r'chromium',              # Chromium
+    r'firefox',               # Firefox
+    r'electron',              # Electron apps
+    r'obsidian',              # Obsidian
+    r'code',                  # VS Code
+    r'telegram',              # Telegram
+    r'\.org\.kde\.',          # KDE
+    r'MdA',                   # Chrome webview (random tmp)
+    r'-webview-',             # Webview processes
+    r'\.npm',                 # npm
+    r'pip-',                  # pip temp
+    r'tmp\d{6,}',             # Generic temp dirs with numbers
+    r'java_pid',              # Java
+    r'hsperfdata',            # Java HotSpot
+    r'\.gnome',               # GNOME
+    r'dbus-',                 # DBus
+    r'pulse-',                # PulseAudio
+    r'\.ICE-unix',            # ICE
+]
+
+_tmp_whitelist_re = [re.compile(p) for p in TMP_WHITELIST_PATTERNS]
+
+
+def _is_tmp_whitelisted(cmdline: str) -> bool:
+    """Returns True if this /tmp process is a known legitimate program"""
+    for pattern in _tmp_whitelist_re:
+        if pattern.search(cmdline):
+            return True
+    return False
+
 
 class ProcessMonitor:
     def __init__(self, config, api):
@@ -53,7 +91,7 @@ class ProcessMonitor:
                 if proc_name in self.whitelist:
                     continue
 
-                # Check by name
+                # Check by suspicious name
                 for sus in SUSPICIOUS_NAMES:
                     if sus in proc_name.lower() or sus in cmdline.lower():
                         alert_id = f"proc_{sus}_{pid}"
@@ -62,9 +100,11 @@ class ProcessMonitor:
                             self._alert_process(proc_name, pid, cmdline, sus)
                         break
 
-                # Check by path
+                # Check by suspicious path — skip whitelisted patterns
                 for sus_path in SUSPICIOUS_PATHS:
                     if cmdline.startswith(sus_path):
+                        if _is_tmp_whitelisted(cmdline):
+                            break  # Normal process, skip
                         alert_id = f"proc_path_{pid}_{cmdline[:40]}"
                         if alert_id not in self.seen_alerts:
                             self.seen_alerts.add(alert_id)
@@ -79,7 +119,7 @@ class ProcessMonitor:
         self.api.send_alert(
             module='process_monitor',
             severity='critical',
-            title=f'⚠️ Suspicious Process: {name}',
+            title=f'🦠 Shubhali jarayon: {name}',
             data={
                 'name': name,
                 'pid': pid,
@@ -94,10 +134,11 @@ class ProcessMonitor:
         )
 
     def _alert_tmp_process(self, name, pid, cmdline):
+        logger.warning(f"Process from /tmp: {name} (PID {pid}) — {cmdline[:80]}")
         self.api.send_alert(
             module='process_monitor',
             severity='warning',
-            title=f'⚠️ Process Running from /tmp',
+            title='⚠️ /tmp dan ishga tushgan jarayon',
             data={
                 'name': name,
                 'pid': pid,
@@ -105,6 +146,7 @@ class ProcessMonitor:
             },
             buttons=[
                 {'label': '☠️ KILL & DELETE', 'action': 'kill_and_delete', 'value': pid},
+                {'label': '🔍 INFO', 'action': 'process_info', 'value': pid},
                 {'label': '✅ IGNORE', 'action': 'ignore', 'value': pid},
             ]
         )
